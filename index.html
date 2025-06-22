@@ -48,13 +48,29 @@
           transform: rotate(360deg);
         }
       }
+
+      @keyframes gradient-move {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      .animate-gradient {
+        background-size: 300% 300%;
+        animation: gradient-move 4s ease-in-out infinite;
+      }
     </style>
   </head>
-  <body class="bg-[#f9fbf9] min-h-screen">
+  <body class="bg-green-50 min-h-screen">
     <div class="relative flex flex-col min-h-screen">
       <!-- Header -->
       <header
-        class="flex items-center justify-between border-b border-[#ebf1ea] px-4 py-3 md:px-10"
+        class="flex items-center justify-between border-b border-[#ebf1ea] px-4 py-3 md:px-10 bg-white shadow-md"
       >
         <div class="flex items-center gap-4">
           <div class="size-4">
@@ -71,16 +87,21 @@
               ></path>
             </svg>
           </div>
-          <h2 class="text-[#121810] text-lg font-bold">
+          <h2
+            class="text-[#121810] text-lg font-bold cursor-pointer"
+            onclick="location.href='/'"
+          >
             Blink.Remove
-            <span class="text-gray-400 text-sm">Dev by : Debanjan Halder</span>
+            <span class="text-gray-400 text-sm"
+              >(Dev by : Debanjan Halder)</span
+            >
           </h2>
         </div>
       </header>
 
       <!-- Main Content -->
-      <main class="flex-1 px-4 py-5 md:px-10">
-        <div class="max-w-4xl mx-auto">
+      <main class="flex-1 px-4 py-5 md:px-10 bg-green-80">
+        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl p-2">
           <!-- Upload Section -->
           <div id="uploadSection" class="mb-8">
             <div
@@ -93,7 +114,11 @@
                   url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1630&q=80');
               "
             >
-              <h1 class="text-white text-3xl md:text-5xl font-black">
+              <h1
+                id="typingTitle"
+                class="text-3xl md:text-5xl font-black bg-gradient-to-r from-pink-500 via-yellow-400 via-green-400 via-blue-500 to-purple-600 bg-clip-text text-transparent animate-gradient drop-shadow-lg"
+                style="min-height: 3.5rem"
+              >
                 Remove Backgrounds in Seconds.
               </h1>
               <p class="text-white text-sm md:text-base max-w-2xl">
@@ -110,7 +135,7 @@
                 />
                 <button
                   id="uploadBtn"
-                  class="bg-[#8cd279] text-[#121810] font-bold px-5 py-3 rounded-xl text-base"
+                  class="bg-[#8cd279] text-[#121810] font-bold px-5 py-3 rounded-full text-base"
                 >
                   Upload Image
                 </button>
@@ -173,7 +198,7 @@
             <div class="flex justify-center px-4 py-3">
               <button
                 id="downloadBtn"
-                class="bg-[#8cd279] text-[#121810] font-bold px-5 py-2 rounded-xl"
+                class="bg-[#8cd279] text-[#121810] font-bold px-5 py-2 rounded-full"
               >
                 Download Result
               </button>
@@ -218,7 +243,8 @@
         const downloadBtn = document.getElementById("downloadBtn");
         const spinner = document.querySelector(".loading-spinner");
 
-        const API_KEY = "7kL99RkpNk1CUTjqN6Xonr2t"; 
+        // API key for Remove.bg - Note: In production, this should be handled server-side
+        const API_KEY = "7kL99RkpNk1CUTjqN6Xonr2t"; // Replace with your actual API key
 
         // Handle file selection via button
         uploadBtn.addEventListener("click", () => fileInput.click());
