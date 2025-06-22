@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Remove backgrounds from images easily." />
+    <meta name="keywords" content="remove background, image processing, AI" />
+    <meta name="author" content="Debanjan Halder" />
+    <meta name="theme-color" content="#8cd279" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <title>Blink.remove</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+      body {
+        font-family: "Manrope", "Noto Sans", sans-serif;
+      }
+      .dropzone {
+        border: 2px dashed #8cd279;
+        transition: all 0.3s ease;
+      }
+      .dropzone.active {
+        border-color: #4caf50;
+        background-color: rgba(140, 210, 121, 0.1);
+      }
+      #resultContainer {
+        display: none;
+      }
+      .loading-spinner {
+        display: none;
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #8cd279;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes gradient-move {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      .animate-gradient {
+        background-size: 300% 300%;
+        animation: gradient-move 4s ease-in-out infinite;
+      }
+    </style>
+  </head>
+  <body class="bg-green-50 min-h-screen">
+    <div class="relative flex flex-col min-h-screen">
+      <!-- Header -->
+      <header
+        class="flex items-center justify-between border-b border-[#ebf1ea] px-4 py-3 md:px-10 bg-white shadow-md"
+      >
+        <div class="flex items-center gap-4">
+          <div class="size-4">
+            <svg
+              viewBox="0 0 48 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z"
+                fill="currentColor"
+              ></path>
+            </svg>
+          </div>
+          <h2
+            class="text-[#121810] text-lg font-bold cursor-pointer"
+            onclick="location.href='/'"
+          >
+            Blink.Remove
+            <span class="text-gray-400 text-sm"
+              >(Dev by : Debanjan Halder)</span
+            >
+          </h2>
+        </div>
+        <nav class="flex items-center gap-6 relative">
+          <!-- Tools Dropdown -->
+          <div class="relative group">
+            <button
+              class="text-[#121810] font-medium hover:text-[#8cd279] transition flex items-center gap-1 focus:outline-none"
+              id="toolsDropdownBtn"
+              type="button"
+            >
+              Tools
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div
+              class="absolute left-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity z-20"
+              id="toolsDropdown"
+            >
+              <a
+                href="index.html"
+                class="block px-4 py-2 text-[#121810] hover:bg-[#f3f7f2] rounded-t-lg"
+                >BG Remover</a
+              >
+              <a
+                href="./blur/blur.html"
+                class="block px-4 py-2 text-[#121810] hover:bg-[#f3f7f2] rounded-b-lg"
+                >Blur Background</a
+              >
+            </div>
+          </div>
+          <a
+            href="/"
+            class="text-[#121810] font-medium hover:text-[#8cd279] transition"
+            >Home</a
+          >
+          <a
+            href="/about"
+            class="text-[#121810] font-medium hover:text-[#8cd279] transition"
+            >About</a
+          >
+        </nav>
+      </header>
+
+      <!-- Main Content -->
+      <main class="flex-1 px-4 py-5 md:px-10 bg-green-80">
+        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl p-2">
+          <!-- Upload Section -->
+          <div id="uploadSection" class="mb-8">
+            <div
+              class="dropzone rounded-xl min-h-[480px] flex flex-col items-center justify-center gap-6 p-4 text-center bg-cover bg-center bg-no-repeat"
+              style="
+                background-image: linear-gradient(
+                    rgba(0, 0, 0, 0.1) 0%,
+                    rgba(0, 0, 0, 0.4) 100%
+                  ),
+                  url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1630&q=80');
+              "
+            >
+              <h1
+                id="typingTitle"
+                class="text-3xl md:text-5xl font-black bg-gradient-to-r from-pink-500 via-yellow-400 via-green-400 via-blue-500 to-purple-600 bg-clip-text text-transparent animate-gradient drop-shadow-lg"
+                style="min-height: 3.5rem"
+              >
+                Remove Backgrounds in Seconds.
+              </h1>
+              <p class="text-white text-sm md:text-base max-w-2xl">
+                Upload your image to remove the background 100% automatically
+                and for free. Instantly remove backgrounds from photos of
+                people, products, animals, cars and more.
+              </p>
+              <div class="flex flex-col items-center gap-4">
+                <input
+                  type="file"
+                  id="fileInput"
+                  accept="image/*"
+                  class="hidden"
+                />
+                <button
+                  id="uploadBtn"
+                  class="bg-[#8cd279] text-[#121810] font-bold px-5 py-3 rounded-full text-base"
+                >
+                  Upload Image
+                </button>
+                <p class="text-white text-sm">or drag and drop image here</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Processing Indicator -->
+          <div
+            id="processingSection"
+            class="hidden flex-col items-center justify-center gap-4 min-h-[480px] text-center"
+          >
+            <div class="loading-spinner"></div>
+            <h2 class="text-[#121810] text-xl font-bold">
+              Processing your image...
+            </h2>
+            <p class="text-[#668a5c]">This usually takes 5-10 seconds</p>
+          </div>
+
+          <!-- Result Section -->
+          <div id="resultContainer" class="hidden">
+            <h2 class="text-[#121810] text-[22px] font-bold px-4 pb-3 pt-5">
+              Preview
+            </h2>
+            <div class="bg-white rounded-xl p-4 mb-4">
+              <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                  <h3 class="text-[#121810] font-medium mb-2">
+                    Original Image
+                  </h3>
+                  <div
+                    class="border border-gray-200 rounded-lg overflow-hidden"
+                  >
+                    <img
+                      id="originalImage"
+                      src=""
+                      alt="Original"
+                      class="w-full h-auto"
+                    />
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-[#121810] font-medium mb-2">
+                    Background Removed
+                  </h3>
+                  <div
+                    class="border border-gray-200 rounded-lg overflow-hidden"
+                  >
+                    <img
+                      id="resultImage"
+                      src=""
+                      alt="Result"
+                      class="w-full h-auto"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex justify-center px-4 py-3">
+              <button
+                id="downloadBtn"
+                class="bg-[#8cd279] text-[#121810] font-bold px-5 py-2 rounded-full mr-3"
+              >
+                Download Result
+              </button>
+              <button
+                id="uploadAgainBtn"
+                class="bg-white border border-[#8cd279] text-[#121810] font-bold px-5 py-2 rounded-full hover:bg-[#f3f7f2] transition"
+              >
+                Upload Again
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="bg-white py-10">
+        <div class="max-w-4xl mx-auto px-5">
+          <div class="flex flex-col items-center gap-6 text-center">
+            <div class="flex flex-wrap justify-center gap-6">
+              <a class="text-[#668a5c] text-base min-w-40" href="#"
+                >Terms of Service</a
+              >
+              <a class="text-[#668a5c] text-base min-w-40" href="#"
+                >Privacy Policy</a
+              >
+              <a class="text-[#668a5c] text-base min-w-40" href="#"
+                >Contact Us</a
+              >
+            </div>
+            <p class="text-[#668a5c] text-base">
+              @2025 BlinkRemove.bg. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const fileInput = document.getElementById("fileInput");
+        const uploadBtn = document.getElementById("uploadBtn");
+        const dropzone = document.querySelector(".dropzone");
+        const uploadSection = document.getElementById("uploadSection");
+        const processingSection = document.getElementById("processingSection");
+        const resultContainer = document.getElementById("resultContainer");
+        const originalImage = document.getElementById("originalImage");
+        const resultImage = document.getElementById("resultImage");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const spinner = document.querySelector(".loading-spinner");
+
+        // API key for Remove.bg - Note: In production, this should be handled server-side
+        const API_KEY = "7kL99RkpNk1CUTjqN6Xonr2t"; // Replace with your actual API key
+
+        // Handle file selection via button
+        uploadBtn.addEventListener("click", () => fileInput.click());
+
+        // Handle file selection
+        fileInput.addEventListener("change", handleFileSelect);
+
+        // Drag and drop functionality
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+          dropzone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        ["dragenter", "dragover"].forEach((eventName) => {
+          dropzone.addEventListener(eventName, highlight, false);
+        });
+
+        ["dragleave", "drop"].forEach((eventName) => {
+          dropzone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+          dropzone.classList.add("active");
+        }
+
+        function unhighlight() {
+          dropzone.classList.remove("active");
+        }
+
+        dropzone.addEventListener("drop", handleDrop, false);
+
+        function handleDrop(e) {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          if (files.length) {
+            handleFiles(files);
+          }
+        }
+
+        function handleFileSelect(e) {
+          const files = e.target.files;
+          if (files.length) {
+            handleFiles(files);
+          }
+        }
+
+        function handleFiles(files) {
+          const file = files[0];
+          if (!file.type.match("image.*")) {
+            alert("Please select an image file.");
+            return;
+          }
+
+          // Show original image preview
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            originalImage.src = e.target.result;
+
+            // Show processing section
+            uploadSection.style.display = "none";
+            processingSection.style.display = "flex";
+            spinner.style.display = "block";
+
+            // Process image (simulated with setTimeout for demo)
+            setTimeout(() => {
+              // In a real app, you would call the Remove.bg API here
+              // For demo purposes, we'll just use a placeholder
+              processImage(file);
+            }, 1500);
+          };
+          reader.readAsDataURL(file);
+        }
+
+        function processImage(file) {
+          // Use Remove.bg API for real background removal
+          const formData = new FormData();
+          formData.append("image_file", file);
+          formData.append("size", "auto");
+
+          fetch("https://api.remove.bg/v1.0/removebg", {
+            method: "POST",
+            headers: {
+              "X-Api-Key": API_KEY,
+            },
+            body: formData,
+          })
+            .then(async (response) => {
+              if (response.ok) {
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                resultImage.src = url;
+
+                // Show result section
+                processingSection.style.display = "none";
+                resultContainer.style.display = "block";
+                spinner.style.display = "none";
+              } else {
+                const error = await response.json();
+                alert(
+                  "Error: " +
+                    (error.errors?.[0]?.title || "Failed to remove background.")
+                );
+                // Show upload section again
+                processingSection.style.display = "none";
+                uploadSection.style.display = "block";
+                spinner.style.display = "none";
+              }
+            })
+            .catch((err) => {
+              alert("Network error: " + err.message);
+              processingSection.style.display = "none";
+              uploadSection.style.display = "block";
+              spinner.style.display = "none";
+            });
+        }
+
+        // Download functionality
+        downloadBtn.addEventListener("click", function () {
+          if (!resultImage.src) return;
+
+          const link = document.createElement("a");
+          link.href = resultImage.src;
+          link.download = "background-removed.png";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+
+        // Upload Again functionality
+        const uploadAgainBtn = document.getElementById("uploadAgainBtn");
+        if (uploadAgainBtn) {
+          uploadAgainBtn.addEventListener("click", function () {
+            // Reset UI to upload state
+            resultContainer.style.display = "none";
+            uploadSection.style.display = "block";
+            originalImage.src = "";
+            resultImage.src = "";
+            if (fileInput) fileInput.value = "";
+          });
+        }
+
+        // For demo purposes - simulate API key warning
+        if (API_KEY === "YOUR_API_KEY") {
+          setTimeout(() => {
+            alert(
+              "Note: This demo simulates background removal. In a production app, you would need a real API key for Remove.bg or similar service."
+            );
+          }, 1000);
+        }
+      });
+
+      const toolsBtn = document.getElementById("toolsDropdownBtn");
+      const toolsDropdown = document.getElementById("toolsDropdown");
+      if (toolsBtn && toolsDropdown) {
+        toolsBtn.addEventListener("focus", () => {
+          toolsDropdown.classList.add("opacity-100", "pointer-events-auto");
+        });
+        toolsBtn.addEventListener("blur", () => {
+          setTimeout(() => {
+            toolsDropdown.classList.remove(
+              "opacity-100",
+              "pointer-events-auto"
+            );
+          }, 150);
+        });
+      }
+    </script>
+  </body>
+</html>
